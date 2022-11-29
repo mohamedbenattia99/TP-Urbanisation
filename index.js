@@ -4,13 +4,13 @@ const app = express();
 
 const mongoose = require("mongoose");
 
-Book = require('./api/model');
+Employee = require('./api/model');
 bodyParser = require('body-parser');
 
 const port = 3001;
 
 //db connection
-const mongoDB = "mongodb://127.0.0.1/books";
+const mongoDB = "mongodb://127.0.0.1/employees";
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error:"));

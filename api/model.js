@@ -1,19 +1,20 @@
 const mongoose = require("mongoose");
 
-const BookSchema = new mongoose.Schema({
+const EmployeeSchema = new mongoose.Schema({
+  _id : {
+    type: Number,
+    required: true,
+    unique: true
+  },
   name: {
     type: String,
     required: true,
   },
-  author: {
-    type: String,
+  salary: {
+    type: Number,
     required: true
   },
-  category: {
-    type: String,
-    required: true
-  }
 });
 
 
-module.exports = mongoose.model('Books',BookSchema);
+module.exports = mongoose.model('Employees', EmployeeSchema);

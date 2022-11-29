@@ -6,8 +6,8 @@ services:
     image: mongo:latest
     restart: always
     volumes:
-      - ./apiData:/data/db
+      - ./apiUrbanisation:/data/db
     environment:
-      - MONGO_INITDB_DATABASE= books
+      - MONGO_INITDB_DATABASE= employees
     ports:
       - 27017:27017

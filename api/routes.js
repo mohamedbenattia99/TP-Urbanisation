@@ -1,13 +1,19 @@
 'use strict'
-var booksList = require('./controller');
+var employeesList = require('./controller');
 
 module.exports = function(app) {
-  app.route('/books')
-    .get(booksList.getAllBooks)
-    .post(booksList.createBook);
+  app.route('/employees')
+    .get(employeesList.getAllEmployees)
+    .post(employeesList.createEmployee);
 
-  app.route('/books/:bookName')
-    .get(booksList.getBookByName)
-    .put(booksList.editBookByName)
-    .delete(booksList.deleteBookByName);
+  app.route('/employees/:employeeId')
+    .get(employeesList.getEmployeeById)
+    .put(employeesList.editEmployeeById)
+    .delete(employeesList.deleteEmployeeById);
+
+  app.route('/salary/euro/:employeeId')
+    .get(employeesList.getEmployeeSalaryInEuro);
+
+  app.route('/salary/dollar/:employeeId')
+    .get(employeesList.getEmployeeSalaryInDollar);
 };
