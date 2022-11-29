@@ -1,0 +1,50 @@
+#%RAML 1.0
+title: employeesapi
+version: v1
+baseUri: http://localhost:8082
+types:
+  Employee:
+    properties:
+      id: number
+      name: string
+      salary: number
+    example:
+      id: 1
+      name: Khalil
+      salary: 500
+     
+resourceTypes:
+  Collection:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<item>>[]
+    post:
+      body:
+        application/json:
+          type: <<item>>
+          
+  Member:
+    delete:
+      responses:
+        204:
+    put:
+      body:
+        application/json:
+          type: <<item>>
+                  
+/employees:
+  type: { Collection: {item: Employee}}
+  /{id}:
+    type: { Member: {item: Employee}}
+    
+/salary:
+  /{id}:
+    /euro:
+      get:  
+    /dollar:
+      get:
+           
+            

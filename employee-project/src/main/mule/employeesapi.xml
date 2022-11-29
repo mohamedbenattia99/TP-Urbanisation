@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <http:listener-config name="employeesapi-httpListenerConfig">
+        <http:listener-connection host="localhost" port="8082" />
+    </http:listener-config>
+    <apikit:config name="employeesapi-config" api="employeesapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="3b9dd43a-d488-401b-b3b9-4eea6fa1d41b" >
+		<http:request-connection host="localhost" port="3001" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="69f66683-e529-4ee7-b382-f0c168178b4e" >
+		<http:request-connection host="localhost" port="3001" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration2" doc:name="HTTP Request configuration" doc:id="daed9d9d-a8d1-46d1-ab9d-28a1110f5ef7" >
+		<http:request-connection host="localhost" port="3001" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration3" doc:name="HTTP Request configuration" doc:id="18fe01f2-a903-498c-b229-bb6d4513c083" >
+		<http:request-connection host="localhost" port="3001" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration4" doc:name="HTTP Request configuration" doc:id="468ea995-df07-465c-82e6-407d6fb48457" >
+		<http:request-connection host="localhost" port="3001" />
+	</http:request-config>
+	<flow name="employeesapi-main">
+        <http:listener config-ref="employeesapi-httpListenerConfig" path="/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="employeesapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">405</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="employeesapi-console">
+        <http:listener config-ref="employeesapi-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="employeesapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="put:\employees\(id):application\json:employeesapi-config">
+		<http:listener doc:name="Listener" doc:id="f59cc703-f61b-47c0-826f-69ce108e5054" config-ref="employeesapi-httpListenerConfig" path="/edit-employee"/>
+		<http:request method="PUT" doc:name="Request" doc:id="9bb187a5-0730-4a76-84c0-448e7cb83f37" config-ref="HTTP_Request_configuration3" path="/employees/:id"/>
+    </flow>
+    <flow name="delete:\employees\(id):employeesapi-config">
+		<http:listener doc:name="Listener" doc:id="31eabd5c-c4a1-48ac-b5d5-0c06f296c5ca" config-ref="employeesapi-httpListenerConfig" path="/delete-employee"/>
+		<http:request method="DELETE" doc:name="Request" doc:id="61e2a5d0-60ba-467b-a833-11c8b4718b82" config-ref="HTTP_Request_configuration2" path="/employees/:id"/>
+    </flow>
+    <flow name="get:\salary\(id)\dollar:employeesapi-config">
+		<http:listener doc:name="Listener" doc:id="80018f30-a0f6-404c-a168-bfdb295f1f3d" config-ref="employeesapi-httpListenerConfig" path="/salary-dollar"/>
+		<http:request method="GET" doc:name="Request" doc:id="e4cc36ea-98c6-4291-9656-ee2e4d3d9b8f" config-ref="HTTP_Request_configuration4" path="/salary/:id/dollar"/>
+    </flow>
+    <flow name="get:\employees:employeesapi-config">
+		<http:listener doc:name="Listener" doc:id="eefe7b6d-d792-4948-83c2-d4810cc2593e" config-ref="employeesapi-httpListenerConfig" path="/all-employees"/>
+		<http:request method="GET" doc:name="Request" doc:id="cd32bee1-76ce-49fe-b036-dac48bd18a8b" config-ref="HTTP_Request_configuration" path="/employees"/>
+    </flow>
+    <flow name="get:\salary\(id)\euro:employeesapi-config">
+		<http:listener doc:name="Listener" doc:id="22bc40bd-4465-45a5-b56a-fc58d4cec752" config-ref="employeesapi-httpListenerConfig" path="/salary/:id/euro"/>
+		<http:request method="GET" doc:name="Request" doc:id="27da2650-1ac7-4be8-a401-ee1ed5825d5b" config-ref="HTTP_Request_configuration1" path="/salary/:id/euro"/>
+    </flow>
+    <flow name="post:\employees:application\json:employeesapi-config">
+        <logger level="INFO" message="post:\employees:application\json:employeesapi-config" />
+    </flow>
+</mule>
